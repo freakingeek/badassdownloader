@@ -13,6 +13,6 @@ COPY . .
 
 RUN npm run build
 
-RUN apk update && apk install chromium
+RUN apk update && apk add chromium
 
 CMD npm start
