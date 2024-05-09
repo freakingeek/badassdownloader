@@ -2,10 +2,7 @@ import puppeteer from "puppeteer";
 import { DOWNLOAD_PATH } from "../../configs/runtime.js";
 
 export default async function tiktokDownloader(videoUrl: string) {
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox"],
-    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
-  });
+  const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
 
   const page = await browser.newPage();
   const client = await page.createCDPSession();
