@@ -2,10 +2,7 @@ import puppeteer from "puppeteer";
 import { DOWNLOAD_PATH } from "../../configs/runtime.js";
 
 export default async function spotifyDownloader(songUrl: string) {
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox"],
-    headless: false,
-  });
+  const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
 
   const page = await browser.newPage();
   const client = await page.createCDPSession();
