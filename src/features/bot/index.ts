@@ -24,20 +24,20 @@ bot.on(message("text"), async (ctx) => {
     return;
   }
 
-  if (message in memo) {
-    await ctx.reply("Done!");
-    await ctx.persistentChatAction("upload_video", async () => {
-      await ctx.replyWithVideo(Input.fromFileId(memo[message]), {
-        caption: "@badassdownloader",
-      });
-    });
-
-    return;
-  }
-
   await ctx.reply("Let me process that ..");
 
   if (platform === Platforms.TikTok) {
+    if (message in memo) {
+      await ctx.reply("Done!");
+      await ctx.persistentChatAction("upload_video", async () => {
+        await ctx.replyWithVideo(Input.fromFileId(memo[message]), {
+          caption: "@badassdownloader",
+        });
+      });
+
+      return;
+    }
+
     const buffer = await tiktokDownloader(message);
 
     ctx.reply("Wait!\nFew more seconds ..");
@@ -51,15 +51,26 @@ bot.on(message("text"), async (ctx) => {
   }
 
   if (platform === Platforms.Spotify) {
+    if (message in memo) {
+      await ctx.reply("Done!");
+      await ctx.persistentChatAction("upload_voice", async () => {
+        await ctx.replyWithAudio(Input.fromFileId(memo[message]), {
+          caption: "@badassdownloader",
+        });
+      });
+
+      return;
+    }
+
     const buffer = await spotifyDownloader(message);
 
     ctx.reply("Wait!\nFew more seconds ..");
     await ctx.persistentChatAction("upload_voice", async () => {
-      const file = await ctx.replyWithVideo(Input.fromBuffer(buffer), {
+      const file = await ctx.replyWithAudio(Input.fromBuffer(buffer), {
         caption: "@badassdownloader",
       });
 
-      memo[message] = file.video.file_id;
+      memo[message] = file.audio.file_id;
     });
   }
 });
