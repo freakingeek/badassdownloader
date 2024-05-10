@@ -1,5 +1,6 @@
 export const enum Platforms {
   TikTok,
+  Spotify,
   Unknown,
 }
 
