@@ -2,7 +2,10 @@ import puppeteer from "puppeteer";
 import { DOWNLOAD_PATH } from "../../configs/runtime.js";
 
 export default async function spotifyDownloader(songUrl: string) {
-  const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox"],
+    headless: false,
+  });
 
   const page = await browser.newPage();
   const client = await page.createCDPSession();
@@ -29,10 +32,30 @@ export default async function spotifyDownloader(songUrl: string) {
     return el[0].getAttribute("href");
   });
 
+  // Metadata
+  const cover = await page.$$eval(".img-thumbnail", (el) => {
+    return el[0].getAttribute("src")!;
+  });
+
+  const coverRes = await fetch(cover)
+  const coverArrayBuffer = await coverRes.arrayBuffer()
+  const coverBuffer = Buffer.from(coverArrayBuffer)
+
+  const name = await page.$$eval("#tracks p:first-child", (el) => {
+    return el[0].textContent!;
+  });
+
+  const artist = await page.$$eval("#tracks p:last-child", (el) => {
+    return el[0].textContent!;
+  });
+
   await browser.close();
 
   const response = await fetch(url!);
   const arrayBuffer = await response.arrayBuffer();
 
-  return Buffer.from(arrayBuffer);
+  return {
+    buffer: Buffer.from(arrayBuffer),
+    metadata: { name, artist, cover: coverBuffer },
+  };
 }

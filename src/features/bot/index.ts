@@ -62,12 +62,16 @@ bot.on(message("text"), async (ctx) => {
       return;
     }
 
-    const buffer = await spotifyDownloader(message);
+    console.log(ctx.update.message);
+    const { buffer, metadata } = await spotifyDownloader(message);
 
     ctx.reply("Wait!\nFew more seconds ..");
     await ctx.persistentChatAction("upload_voice", async () => {
       const file = await ctx.replyWithAudio(Input.fromBuffer(buffer), {
         caption: "@badassdownloader",
+        title: metadata.name,
+        performer: metadata.artist,
+        thumbnail: Input.fromBuffer(metadata.cover),
       });
 
       memo[message] = file.audio.file_id;
