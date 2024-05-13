@@ -62,7 +62,6 @@ bot.on(message("text"), async (ctx) => {
       return;
     }
 
-    console.log(ctx.update.message);
     const { buffer, metadata } = await spotifyDownloader(message);
 
     ctx.reply("Wait!\nFew more seconds ..");
