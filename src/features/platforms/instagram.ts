@@ -11,15 +11,15 @@ export default async function instagramDownloader(postUrl: string) {
     downloadPath: DOWNLOAD_PATH,
   });
 
-  await page.goto("https://snapinsta.app/");
+  await page.goto("https://fastdl.app/en");
 
   await page.type("#url", postUrl);
 
-  await page.click("#btn-submit");
+  await page.click("#submit");
 
-  await page.waitForSelector(".download-bottom a");
+  await page.waitForSelector("#download-btn");
 
-  const url = await page.$$eval(".download-bottom a", (el) => {
+  const url = await page.$$eval("#download-btn", (el) => {
     return el[0].getAttribute("href");
   });
 
