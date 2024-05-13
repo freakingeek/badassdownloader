@@ -11,8 +11,6 @@ export default async function instagramDownloader(postUrl: string) {
     downloadPath: DOWNLOAD_PATH,
   });
 
-  page.setViewport({ width: 1366, height: 768 });
-
   await page.goto("https://snapinsta.app/");
 
   await page.type("#url", postUrl);
