@@ -3,6 +3,7 @@ import { message } from "telegraf/filters";
 import tiktokDownloader from "../platforms/tiktok.js";
 import { platformFinder } from "../../utils/platforms.js";
 import { Animations, Platforms } from "../../configs/enums.js";
+import spotifyDownloader from "../platforms/spotify.js";
 
 const bot = new Telegraf(process.env.BOT_TOKEN!);
 
@@ -23,28 +24,59 @@ bot.on(message("text"), async (ctx) => {
     return;
   }
 
-  await ctx.reply("Just a sec ..");
+  await ctx.reply("Let me process that ..");
 
-  if (message in memo) {
+  if (platform === Platforms.TikTok) {
+    if (message in memo) {
+      await ctx.reply("Done!");
+      await ctx.persistentChatAction("upload_video", async () => {
+        await ctx.replyWithVideo(Input.fromFileId(memo[message]), {
+          caption: "@badassdownloader",
+        });
+      });
+
+      return;
+    }
+
+    const buffer = await tiktokDownloader(message);
+
+    ctx.reply("Wait!\nFew more seconds ..");
     await ctx.persistentChatAction("upload_video", async () => {
-      await ctx.replyWithVideo(Input.fromFileId(memo[message]), {
+      const file = await ctx.replyWithVideo(Input.fromBuffer(buffer), {
         caption: "@badassdownloader",
       });
-    });
 
-    return;
+      memo[message] = file.video.file_id;
+    });
   }
 
-  const buffer = await tiktokDownloader(message);
+  if (platform === Platforms.Spotify) {
+    if (message in memo) {
+      await ctx.reply("Done!");
+      await ctx.persistentChatAction("upload_voice", async () => {
+        await ctx.replyWithAudio(Input.fromFileId(memo[message]), {
+          caption: "@badassdownloader",
+        });
+      });
 
-  ctx.reply("Just little more ..");
-  await ctx.persistentChatAction("upload_video", async () => {
-    const file = await ctx.replyWithVideo(Input.fromBuffer(buffer), {
-      caption: "@badassdownloader",
+      return;
+    }
+
+    console.log(ctx.update.message);
+    const { buffer, metadata } = await spotifyDownloader(message);
+
+    ctx.reply("Wait!\nFew more seconds ..");
+    await ctx.persistentChatAction("upload_voice", async () => {
+      const file = await ctx.replyWithAudio(Input.fromBuffer(buffer), {
+        caption: "@badassdownloader",
+        title: metadata.name,
+        performer: metadata.artist,
+        thumbnail: Input.fromBuffer(metadata.cover),
+      });
+
+      memo[message] = file.audio.file_id;
     });
-
-    memo[message] = file.video.file_id;
-  });
+  }
 });
 
 export default bot;

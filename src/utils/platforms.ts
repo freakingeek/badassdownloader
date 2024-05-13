@@ -5,5 +5,9 @@ export function platformFinder(url: string) {
     return Platforms.TikTok;
   }
 
+  if (url.includes("spotify.com")) {
+    return Platforms.Spotify;
+  }
+
   return Platforms.Unknown;
 }
