@@ -2,6 +2,7 @@ export const enum Platforms {
   TikTok,
   Spotify,
   Unknown,
+  Pinterest,
   Instagram,
 }
 

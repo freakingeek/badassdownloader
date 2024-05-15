@@ -1,21 +1,9 @@
-import puppeteer from "puppeteer";
-import { DOWNLOAD_PATH } from "../../configs/runtime.js";
+import { type Page } from "puppeteer";
 
-export default async function spotifyDownloader(songUrl: string) {
-  const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
-
-  const page = await browser.newPage();
-  const client = await page.createCDPSession();
-  await client.send("Page.setDownloadBehavior", {
-    behavior: "allow",
-    downloadPath: DOWNLOAD_PATH,
-  });
-
-  page.setViewport({ width: 1366, height: 768 });
-
+export default async function spotifyDownloader(page: Page, payload: string) {
   await page.goto("https://spotmate.online/");
 
-  await page.type("#trackUrl", songUrl);
+  await page.type("#trackUrl", payload);
 
   await page.click("#btnSubmit");
 
@@ -34,9 +22,9 @@ export default async function spotifyDownloader(songUrl: string) {
     return el[0].getAttribute("src")!;
   });
 
-  const coverRes = await fetch(cover)
-  const coverArrayBuffer = await coverRes.arrayBuffer()
-  const coverBuffer = Buffer.from(coverArrayBuffer)
+  const coverRes = await fetch(cover);
+  const coverArrayBuffer = await coverRes.arrayBuffer();
+  const coverBuffer = Buffer.from(coverArrayBuffer);
 
   const name = await page.$$eval("#tracks p:first-child", (el) => {
     return el[0].textContent!;
@@ -46,7 +34,7 @@ export default async function spotifyDownloader(songUrl: string) {
     return el[0].textContent!;
   });
 
-  await browser.close();
+  await page.close();
 
   const response = await fetch(url!);
   const arrayBuffer = await response.arrayBuffer();
